@@ -1,0 +1,18 @@
+// break_example.cpp
+// break statement exiting a for statement
+#include <iostream>
+using namespace std;
+
+int main() {
+    int count; // control variable also used after loop
+
+    for (count = 1; count <= 10; ++count) {
+        if (count == 5) {
+            break; // terminates for loop once count == 5
+        }
+
+        cout << count << " ";
+    }
+
+    cout << "\nBroke out of loop at count = " << count << "\n";
+}
