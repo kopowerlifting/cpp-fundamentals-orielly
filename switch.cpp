@@ -1,5 +1,5 @@
 // switch.cpp
-// Multiple selection statement; [[fallthrough]] attribute.
+// Multiple selection statement 
 #include <iostream>
 #include <format>
 using namespace std;
