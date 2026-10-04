@@ -1,6 +1,123 @@
 // principal_component_analysis.cpp
 //
 // This program performs Principal Component Analysis (PCA) on a dataset.
+#include <iostream>
+#include <array>
+#include <format>
+#include <cstddef>
+
+constexpr std::size_t observations{3};
+constexpr std::size_t features{3};
+
+using Vector = std::array<double, features>;
+using Matrix = std::array<Vector, observations>;
+Vector calculateMean(const Matrix& data);
+Matrix centreData(const Matrix& data, const Vector& mean);
+Matrix transposeMatrix(const Matrix& data);
+Matrix calculateCovariance(const Matrix& transposeData, const Matrix& centredData);
+
+int main() {
+    // Example dataset with 3 observations and 3 features
+    Matrix data{{
+        {1.0, 1.0, 5.0},
+        {2.0, 1.0, 5.0},
+        {3.0, 2.0, 0.0}
+    }};
+
+    // Calculate the mean of each feature
+    Vector mean = calculateMean(data);
+    std::cout << "Mean vector:\n";
+    for (const auto& m : mean) {
+        std::cout << std::format("{:.2f} ", m);
+    }
+    std::cout << "\n\n";
+
+    // Centre the data
+    Matrix centredData = centreData(data, mean);
+    std::cout << "Centred data:\n";
+    for (const auto& row : centredData) {
+        for (const auto& value : row) {
+            std::cout << std::format("{:.2f} ", value);
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+
+    // Compute the transpose of the centred data
+    Matrix transposeData = transposeMatrix(centredData);
+    std::cout << "Transposed centred data:\n";
+    for (const auto& row : transposeData) {
+        for (const auto& value : row) {
+            std::cout << std::format("{:.2f} ", value);
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+
+    // Compute the covariance matrix
+    Matrix covariance = calculateCovariance(transposeData, centredData);
+    std::cout << "Covariance matrix:\n";
+    for (const auto& row : covariance) {
+        for (const auto& value : row) {
+            std::cout << std::format("{:.2f} ", value);
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+    return 0;
+}
+
+
+Vector calculateMean(const Matrix& data) {
+    Vector mean{};
+    for (const auto& row : data) {
+        for (std::size_t j = 0; j < features; ++j) {
+            mean[j] += row[j];
+        }
+    }
+    for (auto& m : mean) {
+        m /= observations;
+    }
+    return mean;
+}
+
+
+Matrix centreData(const Matrix& data, const Vector& mean) {
+    Matrix centredData{};
+    for (std::size_t i = 0; i < observations; ++i) {
+        for (std::size_t j = 0; j < features; ++j) {
+            centredData[i][j] = data[i][j] - mean[j];
+        }
+    }
+    return centredData;
+}
+
+
+Matrix transposeMatrix(const Matrix& data) {
+    Matrix transpose{};
+    for (std::size_t i = 0; i < observations; ++i) {
+        for (std::size_t j = 0; j < features; ++j) {
+            transpose[j][i] = data[i][j];
+        }
+    }
+    return transpose;
+}
+
+
+Matrix calculateCovariance(const Matrix& transposeData, const Matrix& centredData) {
+    Matrix covariance{};
+    for (std::size_t i = 0; i < features; ++i) {
+        for (std::size_t j = 0; j < features; ++j) {
+            double sum = 0;
+            for (std::size_t k = 0; k < observations; ++k) {
+                sum += transposeData[i][k] * centredData[k][j];
+            }
+            covariance[i][j] = sum / (observations - 1);
+        }
+    }
+    return covariance;
+}
+
 //
 // Goal:
 //   Find a new set of orthogonal axes, called principal components, that capture
